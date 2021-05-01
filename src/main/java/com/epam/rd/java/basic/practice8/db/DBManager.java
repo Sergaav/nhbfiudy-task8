@@ -5,10 +5,7 @@ import com.epam.rd.java.basic.practice8.db.entity.User;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
@@ -54,10 +51,10 @@ public class DBManager {
     public static void insertUser(User user) {
         try {
             Connection connection = dbManager.getConnection(dbManager.url);
-            String sql = "INSERT INTO users VALUES (id,'" + user.getLogin() + "');";
-            System.out.println(sql);
-            Statement statement = connection.createStatement();
-            statement.executeQuery(sql);
+            String sql = "INSERT INTO users VALUES (id,?);";
+           PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, user.getLogin());
+            System.out.println(statement.executeUpdate());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
