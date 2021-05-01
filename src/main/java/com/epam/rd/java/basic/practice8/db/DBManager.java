@@ -45,12 +45,7 @@ public class DBManager {
 
     public Connection getConnection(String connectionUrl) throws SQLException {
         Connection connection = null;
-//        try {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-         DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+        DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         connection = DriverManager.getConnection(connectionUrl);
         return connection;
     }
@@ -59,7 +54,8 @@ public class DBManager {
     public static void insertUser(User user) {
         try {
             Connection connection = dbManager.getConnection(dbManager.url);
-            String sql = "INSERT INTO (users) VALUES ('" + user.getLogin() + "');";
+            String sql = "INSERT INTO users VALUES (id,'" + user.getLogin() + "');";
+            System.out.println(sql);
             Statement statement = connection.createStatement();
             statement.executeQuery(sql);
         } catch (SQLException throwables) {
