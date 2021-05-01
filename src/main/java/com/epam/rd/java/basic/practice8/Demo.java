@@ -23,8 +23,8 @@ public class Demo {
 
         // Part 1
 
-        dbManager.insertUser(User.createUser("petrov"));
-        dbManager.insertUser(User.createUser("obama"));
+        DBManager.insertUser(User.createUser("petrov"));
+        DBManager.insertUser(User.createUser("obama"));
 
         printList(dbManager.findAllUsers());
 

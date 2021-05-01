@@ -9,8 +9,13 @@ public class User {
         return login;
     }
 
-    public static User createUser(String login){
-        return null;
+    public static User createUser(String login) {
+            User user = new User();
+            user.login = login;
+        return user;
+    }
+
+    private User() {
     }
 
     @Override

@@ -1,15 +1,21 @@
 package com.epam.rd.java.basic.practice8.db;
+
 import com.epam.rd.java.basic.practice8.db.entity.Team;
 import com.epam.rd.java.basic.practice8.db.entity.User;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.Properties;
 
 public class DBManager {
 
     private static DBManager dbManager;
+    private String url;
 
 
     public static User getUser(String login) {
@@ -24,22 +30,45 @@ public class DBManager {
     }
 
     public static DBManager getInstance() {
-
-        return null;
+        if (dbManager == null) {
+            dbManager = new DBManager();
+            try (FileInputStream fis = new FileInputStream("app.properties")) {
+                Properties properties = new Properties();
+                properties.load(fis);
+                dbManager.url = properties.getProperty("connection.url");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return dbManager;
     }
 
     public Connection getConnection(String connectionUrl) throws SQLException {
-
-        return null;
+        Connection connection = null;
+//        try {
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+         DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+        connection = DriverManager.getConnection(connectionUrl);
+        return connection;
     }
 
 
-
-    public static void insertUser (User user){
+    public static void insertUser(User user) {
+        try {
+            Connection connection = dbManager.getConnection(dbManager.url);
+            String sql = "INSERT INTO (users) VALUES ('" + user.getLogin() + "');";
+            Statement statement = connection.createStatement();
+            statement.executeQuery(sql);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 
     }
 
-    public static void insertTeam (Team team){
+    public static void insertTeam(Team team) {
 
     }
 
@@ -54,10 +83,12 @@ public class DBManager {
     public void setTeamsForUser(User user, Team team) {
 
     }
-    public void setTeamsForUser(User user, Team team1,Team team2) {
+
+    public void setTeamsForUser(User user, Team team1, Team team2) {
 
     }
-    public void setTeamsForUser(User user, Team team1,Team team2,Team team3) {
+
+    public void setTeamsForUser(User user, Team team1, Team team2, Team team3) {
 
     }
 
