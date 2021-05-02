@@ -15,7 +15,6 @@ public class DBManager {
     private static DBManager dbManager;
     private String url;
 
-
     public static User getUser(String login) {
         String sql = "SELECT id,login FROM users WHERE login=?;";
         User user = null;
@@ -64,7 +63,7 @@ public class DBManager {
     }
 
     public Connection getConnection(String connectionUrl) throws SQLException {
-        Connection connection = null;
+        Connection connection;
         DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         connection = DriverManager.getConnection(connectionUrl);
         return connection;
@@ -128,15 +127,130 @@ public class DBManager {
     }
 
     public void setTeamsForUser(User user, Team team) {
-
+        String sql = "INSERT INTO users_teams VALUES (?,?);";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DBManager.getInstance().getConnection(dbManager.url);
+            statement = connection.prepareStatement(sql);
+            connection.setAutoCommit(false);
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team.getId());
+            statement.executeUpdate();
+            connection.commit();
+        } catch (SQLException throwables) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+            throwables.printStackTrace();
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+        }
     }
 
     public void setTeamsForUser(User user, Team team1, Team team2) {
-
+        String sql = "INSERT INTO users_teams VALUES (?,?);";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DBManager.getInstance().getConnection(dbManager.url);
+            statement = connection.prepareStatement(sql);
+            connection.setAutoCommit(false);
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team1.getId());
+            statement.executeUpdate();
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team2.getId());
+            statement.executeUpdate();
+            connection.commit();
+        } catch (SQLException throwables) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+            throwables.printStackTrace();
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+        }
     }
 
     public void setTeamsForUser(User user, Team team1, Team team2, Team team3) {
-
+        String sql = "INSERT INTO users_teams VALUES (?,?);";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DBManager.getInstance().getConnection(dbManager.url);
+            statement = connection.prepareStatement(sql);
+            connection.setAutoCommit(false);
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team1.getId());
+            statement.executeUpdate();
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team2.getId());
+            statement.executeUpdate();
+            statement.setInt(1, user.getId());
+            statement.setInt(2, team3.getId());
+            statement.executeUpdate();
+            connection.commit();
+        } catch (SQLException throwables) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+            throwables.printStackTrace();
+        } finally {
+            if (statement != null){
+                try {
+                    statement.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+        }
     }
 
     public List<Team> getUserTeams(User user) {
@@ -144,7 +258,7 @@ public class DBManager {
                 "JOIN teams ON teams.id=users_teams.team_id WHERE users.login=?;";
         List<Team> teamList = new ArrayList<>();
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql);) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getLogin());
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -160,8 +274,8 @@ public class DBManager {
     public void deleteTeam(Team teamA) {
         String sql = "DELETE FROM teams WHERE id=?";
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql);){
-            statement.setInt(1,teamA.getId());
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, teamA.getId());
             statement.executeUpdate();
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
@@ -171,9 +285,9 @@ public class DBManager {
     public void updateTeam(Team teamC) {
         String sql = "UPDATE teams SET name=? WHERE id=?;";
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql);) {
-            statement.setString(1,teamC.getName());
-            statement.setInt(2,teamC.getId());
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, teamC.getName());
+            statement.setInt(2, teamC.getId());
             statement.executeUpdate();
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
