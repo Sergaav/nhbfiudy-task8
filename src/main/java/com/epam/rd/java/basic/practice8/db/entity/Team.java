@@ -4,13 +4,27 @@ import java.util.Objects;
 
 public class Team {
     private String name;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private Team() {
+    }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public static Team createTeam(String teamB) {
-        return null;
+    public static Team createTeam(String name) {
+        Team team = new Team();
+        team.setName(name);
+        return team;
     }
 
     public String getName() {

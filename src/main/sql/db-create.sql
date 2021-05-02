@@ -1,5 +1,7 @@
 CREATE DATABASE [IF NOT EXISTS] practice8;
 
+USE paractice8;
+
 CREATE TABLE users (
 
                        id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -25,4 +27,8 @@ CREATE TABLE users_teams (
                              UNIQUE (user_id, team_id)
 
 );
+
+INSERT INTO users VALUES (id,'ivanov');
+
+INSERT INTO teams VALUES (id,'TeamA');
 

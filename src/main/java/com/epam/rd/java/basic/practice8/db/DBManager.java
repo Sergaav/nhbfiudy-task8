@@ -6,6 +6,7 @@ import com.epam.rd.java.basic.practice8.db.entity.User;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,11 +17,33 @@ public class DBManager {
 
 
     public static User getUser(String login) {
-        return null;
+        String sql = "SELECT id,login FROM users WHERE login=?;";
+        User user = null;
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery(sql);
+            user = User.createUser(resultSet.getString("login"));
+            user.setId(resultSet.getInt("id"));
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
+        return user;
     }
 
     public static Team getTeam(String name) {
-        return null;
+        String sql = "SELECT id,name FROM teams WHERE name=?;";
+        Team team = null;
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery(sql);
+            team = Team.createTeam(resultSet.getString("name"));
+            team.setId(resultSet.getInt("id"));
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
+        return team;
     }
 
     private DBManager() {
@@ -49,28 +72,59 @@ public class DBManager {
 
 
     public static void insertUser(User user) {
-        try {
-            Connection connection = dbManager.getConnection(dbManager.url);
-            String sql = "INSERT INTO users VALUES (id,?);";
-           PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO users VALUES (id,?);";
+        try (Connection connection = dbManager.getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getLogin());
-            System.out.println(statement.executeUpdate());
+            statement.executeUpdate();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            System.err.println(throwables.getMessage());
         }
-
     }
 
     public static void insertTeam(Team team) {
-
+        String sql = "INSERT INTO teams VALUES (id,?);";
+        try (Connection connection = dbManager.getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, team.getName());
+            statement.executeUpdate();
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
     }
 
     public List<User> findAllUsers() {
-        return null;
+        List<User> userList = new ArrayList<>();
+        String sql = "SELECT id,login FROM users;";
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                User user = User.createUser(resultSet.getString("login"));
+                user.setId(resultSet.getInt("id"));
+                userList.add(user);
+            }
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
+        return userList;
     }
 
     public List<Team> findAllTeams() {
-        return null;
+        List<Team> teamList = new ArrayList<>();
+        String sql = "SELECT id,name FROM teams;";
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                Team team = Team.createTeam(resultSet.getString("name"));
+                team.setId(resultSet.getInt("id"));
+                teamList.add(team);
+            }
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
+        return teamList;
     }
 
     public void setTeamsForUser(User user, Team team) {
@@ -86,12 +140,43 @@ public class DBManager {
     }
 
     public List<Team> getUserTeams(User user) {
-        return null;
+        String sql = "SELECT users.login,teams.name FROM users JOIN users_teams ON users.id = users_teams.user_id " +
+                "JOIN teams ON teams.id=users_teams.team_id WHERE users.login=?;";
+        List<Team> teamList = new ArrayList<>();
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql);) {
+            statement.setString(1, user.getLogin());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Team team = Team.createTeam(resultSet.getString("name"));
+                teamList.add(team);
+            }
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
+        return teamList;
     }
 
     public void deleteTeam(Team teamA) {
+        String sql = "DELETE FROM teams WHERE id=?";
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql);){
+            statement.setInt(1,teamA.getId());
+            statement.executeUpdate();
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
     }
 
     public void updateTeam(Team teamC) {
+        String sql = "UPDATE teams SET name=? WHERE id=?;";
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql);) {
+            statement.setString(1,teamC.getName());
+            statement.setInt(2,teamC.getId());
+            statement.executeUpdate();
+        } catch (SQLException throwables) {
+            System.err.println(throwables.getMessage());
+        }
     }
 }
