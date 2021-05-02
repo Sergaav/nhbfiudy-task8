@@ -16,16 +16,37 @@ public class DBManager {
     private String url;
 
     public static User getUser(String login) {
-        String sql = "SELECT id,login FROM users WHERE login=?;";
-        User user = null;
-        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, login);
-            ResultSet resultSet = statement.executeQuery(sql);
-            user = User.createUser(resultSet.getString("login"));
-            user.setId(resultSet.getInt("id"));
+    String sql = "SELECT id,login FROM users WHERE login=?;";
+    Connection connection=null;
+    PreparedStatement statement=null;
+    User user=null;
+        try {
+            connection = DBManager.getInstance().getConnection(dbManager.url);
+            statement = connection.prepareStatement(sql);
+            statement.setString(1,login);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                user = User.createUser(resultSet.getString("login"));
+                user.setId(resultSet.getInt("id"));
+            }
         } catch (SQLException throwables) {
-            System.err.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }finally {
+            if (connection != null){
+                try {
+                    connection.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+
+            if (statement != null){
+                try {
+                    statement.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
         }
         return user;
     }
@@ -72,10 +93,16 @@ public class DBManager {
 
     public static void insertUser(User user) {
         String sql = "INSERT INTO users VALUES (id,?);";
+        String sqlId = "SELECT id FROM users WHERE login=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             Connection connection1 = dbManager.getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             PreparedStatement statement1 = connection1.prepareStatement(sqlId)) {
             statement.setString(1, user.getLogin());
             statement.executeUpdate();
+            statement1.setString(1, user.getLogin());
+            ResultSet resultSet = statement.executeQuery();
+            user.setId(resultSet.getInt("id"));
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         }
@@ -83,10 +110,16 @@ public class DBManager {
 
     public static void insertTeam(Team team) {
         String sql = "INSERT INTO teams VALUES (id,?);";
+        String sqlId = "SELECT id FROM teams WHERE name=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             Connection connection1 = dbManager.getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql);
+             PreparedStatement preparedStatement = connection1.prepareStatement(sqlId)) {
             statement.setString(1, team.getName());
             statement.executeUpdate();
+            preparedStatement.setString(1, team.getName());
+            ResultSet set = statement.executeQuery();
+            team.setId(set.getInt("id"));
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         }
@@ -236,7 +269,7 @@ public class DBManager {
             }
             throwables.printStackTrace();
         } finally {
-            if (statement != null){
+            if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException throwables) {

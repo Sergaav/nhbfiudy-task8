@@ -44,6 +44,7 @@ public class Demo {
         User userPetrov = DBManager.getUser("petrov");
 
         User userIvanov = DBManager.getUser("ivanov");
+        System.out.println(userIvanov);
 
         User userObama = DBManager.getUser("obama");
 
@@ -57,37 +58,37 @@ public class Demo {
         dbManager.setTeamsForUser(userIvanov, teamA);
         dbManager.setTeamsForUser(userPetrov, teamA, teamB);
         dbManager.setTeamsForUser(userObama, teamA, teamB, teamC);
-
-        for (User user : dbManager.findAllUsers()) {
-
-            printList(dbManager.getUserTeams(user));
-            System.out.println("~~~~~");
-
-        }
-
-        // teamA
-
-        // teamA teamB
-
-        // teamA teamB teamC
-        System.out.println("===========================");
-
-// Part 4
-
-// on delete cascade!
-
-        dbManager.deleteTeam(teamA);
-
-// Part 5
-
-        teamC.setName("teamX");
-
-        dbManager.updateTeam(teamC);
-
-        printList(dbManager.findAllTeams());
-
-        // teams ==> [teamB, teamX]
-
+//
+//        for (User user : dbManager.findAllUsers()) {
+//
+//            printList(dbManager.getUserTeams(user));
+//            System.out.println("~~~~~");
+//
+//        }
+//
+//        // teamA
+//
+//        // teamA teamB
+//
+//        // teamA teamB teamC
+//        System.out.println("===========================");
+//
+//// Part 4
+//
+//// on delete cascade!
+//
+//        dbManager.deleteTeam(teamA);
+//
+//// Part 5
+//
+//        teamC.setName("teamX");
+//
+//        dbManager.updateTeam(teamC);
+//
+//        printList(dbManager.findAllTeams());
+//
+//        // teams ==> [teamB, teamX]
+//
     }
 
 
