@@ -48,47 +48,47 @@ public class Demo {
 
         User userObama = DBManager.getUser("obama");
 
-        Team teamA = DBManager.getTeam("teamA");
+       Team teamA = DBManager.getTeam("teamA");
 
-        Team teamB = DBManager.getTeam("teamB");
+       Team teamB = DBManager.getTeam("teamB");
 
         Team teamC = DBManager.getTeam("teamC");
 
-        // method setTeamsForUser must implement transaction!
+   //      method setTeamsForUser must implement transaction!
         dbManager.setTeamsForUser(userIvanov, teamA);
         dbManager.setTeamsForUser(userPetrov, teamA, teamB);
         dbManager.setTeamsForUser(userObama, teamA, teamB, teamC);
-//
-//        for (User user : dbManager.findAllUsers()) {
-//
-//            printList(dbManager.getUserTeams(user));
-//            System.out.println("~~~~~");
-//
-//        }
-//
-//        // teamA
-//
-//        // teamA teamB
-//
-//        // teamA teamB teamC
-//        System.out.println("===========================");
-//
-//// Part 4
-//
-//// on delete cascade!
-//
-//        dbManager.deleteTeam(teamA);
-//
-//// Part 5
-//
-//        teamC.setName("teamX");
-//
-//        dbManager.updateTeam(teamC);
-//
-//        printList(dbManager.findAllTeams());
-//
-//        // teams ==> [teamB, teamX]
-//
+
+        for (User user : dbManager.findAllUsers()) {
+
+            printList(dbManager.getUserTeams(user));
+            System.out.println("~~~~~");
+
+        }
+
+        // teamA
+
+        // teamA teamB
+
+        // teamA teamB teamC
+        System.out.println("===========================");
+
+// Part 4
+
+// on delete cascade!
+
+        dbManager.deleteTeam(teamA);
+
+ //Part 5
+
+        teamC.setName("teamX");
+
+        dbManager.updateTeam(teamC);
+
+        printList(dbManager.findAllTeams());
+
+        // teams ==> [teamB, teamX]
+
     }
 
 

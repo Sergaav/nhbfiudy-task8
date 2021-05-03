@@ -16,23 +16,23 @@ public class DBManager {
     private String url;
 
     public static User getUser(String login) {
-    String sql = "SELECT id,login FROM users WHERE login=?;";
-    Connection connection=null;
-    PreparedStatement statement=null;
-    User user=null;
+        String sql = "SELECT id,login FROM users WHERE login=?;";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        User user = null;
         try {
             connection = DBManager.getInstance().getConnection(dbManager.url);
             statement = connection.prepareStatement(sql);
-            statement.setString(1,login);
+            statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 user = User.createUser(resultSet.getString("login"));
                 user.setId(resultSet.getInt("id"));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        }finally {
-            if (connection != null){
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException throwables) {
@@ -40,7 +40,7 @@ public class DBManager {
                 }
             }
 
-            if (statement != null){
+            if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException throwables) {
@@ -52,16 +52,36 @@ public class DBManager {
     }
 
     public static Team getTeam(String name) {
-        String sql = "SELECT id,name FROM teams WHERE name=?;";
+        String sqlTeam = "SELECT id,name FROM teams WHERE name=?;";
         Team team = null;
-        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DBManager.getInstance().getConnection(dbManager.url);
+            statement = connection.prepareStatement(sqlTeam);
             statement.setString(1, name);
-            ResultSet resultSet = statement.executeQuery(sql);
-            team = Team.createTeam(resultSet.getString("name"));
-            team.setId(resultSet.getInt("id"));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                team = Team.createTeam(resultSet.getString("name"));
+                team.setId(resultSet.getInt("id"));
+            }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException throwables) {
+                    System.err.println(throwables.getMessage());
+                }
+            }
         }
         return team;
     }
@@ -77,7 +97,7 @@ public class DBManager {
                 properties.load(fis);
                 dbManager.url = properties.getProperty("connection.url");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             }
         }
         return dbManager;
@@ -179,7 +199,7 @@ public class DBManager {
                     System.err.println(e.getMessage());
                 }
             }
-            throwables.printStackTrace();
+            System.err.println(throwables.getMessage());
         } finally {
             if (statement != null) {
                 try {
@@ -221,7 +241,7 @@ public class DBManager {
                     System.err.println(e.getMessage());
                 }
             }
-            throwables.printStackTrace();
+            System.err.println(throwables.getMessage());
         } finally {
             if (statement != null) {
                 try {
@@ -267,13 +287,13 @@ public class DBManager {
                     System.err.println(e.getMessage());
                 }
             }
-            throwables.printStackTrace();
+            System.err.println(throwables.getMessage());
         } finally {
             if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    System.err.println(throwables.getMessage());
                 }
             }
             if (connection != null) {
@@ -306,12 +326,14 @@ public class DBManager {
 
     public void deleteTeam(Team teamA) {
         String sql = "DELETE FROM teams WHERE id=?";
-        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, teamA.getId());
-            statement.executeUpdate();
-        } catch (SQLException throwables) {
-            System.err.println(throwables.getMessage());
+        if (teamA != null) {
+            try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, teamA.getId());
+                statement.executeUpdate();
+            } catch (SQLException throwables) {
+                System.err.println(throwables.getMessage());
+            }
         }
     }
 
