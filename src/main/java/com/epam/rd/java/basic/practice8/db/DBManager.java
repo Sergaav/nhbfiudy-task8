@@ -33,9 +33,9 @@ public class DBManager {
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         } finally {
+            closeConnection(connection);
             closeStatement(statement);
             closeResultSet(resultSet);
-            closeConnection(connection);
         }
         return user;
     }
@@ -59,9 +59,9 @@ public class DBManager {
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         } finally {
+            closeConnection(connection);
             closeStatement(statement);
             closeResultSet(resultSet);
-            closeConnection(connection);
         }
         return team;
     }
