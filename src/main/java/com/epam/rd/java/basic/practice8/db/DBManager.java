@@ -243,20 +243,28 @@ public class DBManager {
             }
             System.err.println(throwables.getMessage());
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
+            closeStatement(statement);
+            closeConnectionAutocommit(connection);
+        }
+    }
+
+    public void closeStatement (PreparedStatement statement){
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException throwables) {
+                System.err.println(throwables.getMessage());
             }
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
+        }
+    }
+
+    public void closeConnectionAutocommit(Connection con){
+        if (con != null) {
+            try {
+                con.setAutoCommit(true);
+                con.close();
+            } catch (SQLException throwables) {
+                System.err.println(throwables.getMessage());
             }
         }
     }
@@ -289,20 +297,8 @@ public class DBManager {
             }
             System.err.println(throwables.getMessage());
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
+            closeStatement(statement);
+            closeConnectionAutocommit(connection);
         }
     }
 
