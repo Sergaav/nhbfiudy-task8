@@ -50,10 +50,46 @@ public class Part3StudentTest {
 
             statement.executeUpdate(sql);
         }
+
+
     }
 
     @Test
-    public void shouldReturnListOfUsers() {
+    public void shouldReturnTeamOfUserIvanov() {
+        dbManager = DBManager.getInstance();
+        DBManager.insertUser(User.createUser("ivanov"));
+        User userPetrov = DBManager.getUser("petrov");
+        User userObama = DBManager.getUser("obama");
+        User userIvanov = DBManager.getUser("ivanov");
+        DBManager.insertTeam(Team.createTeam("teamA"));
+        Team teamA = DBManager.getTeam("teamA");
+        Team teamB = DBManager.getTeam("teamB");
+        Team teamC = DBManager.getTeam("teamC");
+        dbManager.setTeamsForUser(userIvanov, teamA);
+        dbManager.setTeamsForUser(userPetrov, teamA, teamB);
+        dbManager.setTeamsForUser(userObama, teamA, teamB, teamC);
+        Assert.assertEquals(1, dbManager.getUserTeams(userIvanov).size());
+    }
+
+    @Test
+    public void shouldReturnTeamsOfUserPetrov() {
+        dbManager = DBManager.getInstance();
+        DBManager.insertUser(User.createUser("ivanov"));
+        User userPetrov = DBManager.getUser("petrov");
+        User userObama = DBManager.getUser("obama");
+        User userIvanov = DBManager.getUser("ivanov");
+        DBManager.insertTeam(Team.createTeam("teamA"));
+        Team teamA = DBManager.getTeam("teamA");
+        Team teamB = DBManager.getTeam("teamB");
+        Team teamC = DBManager.getTeam("teamC");
+        dbManager.setTeamsForUser(userIvanov, teamA);
+        dbManager.setTeamsForUser(userPetrov, teamA, teamB);
+        dbManager.setTeamsForUser(userObama, teamA, teamB, teamC);
+        Assert.assertEquals(2, dbManager.getUserTeams(userPetrov).size());
+    }
+
+    @Test
+    public void shouldReturnTeamOfUserObama() {
         dbManager = DBManager.getInstance();
         DBManager.insertUser(User.createUser("ivanov"));
         User userPetrov = DBManager.getUser("petrov");
@@ -67,7 +103,9 @@ public class Part3StudentTest {
         dbManager.setTeamsForUser(userPetrov, teamA, teamB);
         dbManager.setTeamsForUser(userObama, teamA, teamB, teamC);
         Assert.assertEquals(3, dbManager.getUserTeams(userObama).size());
-        Assert.assertEquals(2, dbManager.getUserTeams(userPetrov).size());
-        Assert.assertEquals(1, dbManager.getUserTeams(userIvanov).size());
     }
+
+
+
+
 }
