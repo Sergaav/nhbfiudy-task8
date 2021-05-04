@@ -17,13 +17,10 @@ public class DBManager {
 
     public static User getUser(String login) {
         String sql = "SELECT id,login FROM users WHERE login=?;";
-        Connection connection = null;
-        PreparedStatement statement = null;
         User user = null;
         ResultSet resultSet = null;
-        try {
-            connection = DBManager.getInstance().getConnection(dbManager.url);
-            statement = connection.prepareStatement(sql);
+        try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, login);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -34,8 +31,6 @@ public class DBManager {
             System.err.println(throwables.getMessage());
         } finally {
             closeResultSet(resultSet);
-            closeStatement(statement);
-            closeConnection(connection);
         }
         return user;
     }
@@ -44,12 +39,9 @@ public class DBManager {
     public static Team getTeam(String name) {
         String sqlTeam = "SELECT id,name FROM teams WHERE name=?;";
         Team team = null;
-        Connection connection = null;
-        PreparedStatement statement = null;
         ResultSet resultSet = null;
-        try {
-            connection = DBManager.getInstance().getConnection(dbManager.url);
-            statement = connection.prepareStatement(sqlTeam);
+        try (Connection connection= DBManager.getInstance().getConnection(dbManager.url);
+             PreparedStatement statement = connection.prepareStatement(sqlTeam)){
             statement.setString(1, name);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -60,8 +52,6 @@ public class DBManager {
             System.err.println(throwables.getMessage());
         } finally {
             closeResultSet(resultSet);
-            closeStatement(statement);
-            closeConnection(connection);
         }
         return team;
     }
@@ -271,19 +261,19 @@ public class DBManager {
 
     public void setTeamsForUser(User user, Team team1, Team team2, Team team3) {
         String sql = "INSERT INTO users_teams VALUES (?,?),(?,?),(?,?);";
-        Connection connection = null;
-        PreparedStatement statement = null;
+        Connection connection=null;
+        PreparedStatement preparedStatement=null;
         try {
             connection = DBManager.getInstance().getConnection(dbManager.url);
-            statement = connection.prepareStatement(sql);
             connection.setAutoCommit(false);
-            statement.setInt(1, user.getId());
-            statement.setInt(2, team1.getId());
-            statement.setInt(3, user.getId());
-            statement.setInt(4, team2.getId());
-            statement.setInt(5, user.getId());
-            statement.setInt(6, team3.getId());
-            statement.executeUpdate();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, user.getId());
+            preparedStatement.setInt(2, team1.getId());
+            preparedStatement.setInt(3, user.getId());
+            preparedStatement.setInt(4, team2.getId());
+            preparedStatement.setInt(5, user.getId());
+            preparedStatement.setInt(6, team3.getId());
+            preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
             if (connection != null) {
@@ -295,8 +285,9 @@ public class DBManager {
             }
             System.err.println(throwables.getMessage());
         } finally {
-            closeStatement(statement);
-            closeConnectionAutocommit(connection);
+            closeStatement(preparedStatement);
+            closeConnection(connection);
+
         }
     }
 
