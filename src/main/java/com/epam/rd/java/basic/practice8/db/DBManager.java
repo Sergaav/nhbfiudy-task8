@@ -105,7 +105,7 @@ public class DBManager {
 
     public Connection getConnection(String connectionUrl) throws SQLException {
         Connection connection;
-        DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+     //   DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         connection = DriverManager.getConnection(connectionUrl);
         return connection;
     }
