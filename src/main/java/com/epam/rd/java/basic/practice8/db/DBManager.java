@@ -20,33 +20,22 @@ public class DBManager {
         Connection connection = null;
         PreparedStatement statement = null;
         User user = null;
+        ResultSet resultSet = null;
         try {
             connection = DBManager.getInstance().getConnection(dbManager.url);
             statement = connection.prepareStatement(sql);
             statement.setString(1, login);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 user = User.createUser(resultSet.getString("login"));
                 user.setId(resultSet.getInt("id"));
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+           System.err.println(throwables.getMessage());
         } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
-
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-            }
+          closeResultSet(resultSet);
+          closeStatement(statement);
+          closeConnection(connection);
         }
         return user;
     }
@@ -56,11 +45,12 @@ public class DBManager {
         Team team = null;
         Connection connection = null;
         PreparedStatement statement = null;
+        ResultSet resultSet=null;
         try {
             connection = DBManager.getInstance().getConnection(dbManager.url);
             statement = connection.prepareStatement(sqlTeam);
             statement.setString(1, name);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 team = Team.createTeam(resultSet.getString("name"));
                 team.setId(resultSet.getInt("id"));
@@ -68,20 +58,9 @@ public class DBManager {
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
+            closeResultSet(resultSet);
+            closeStatement(statement);
+            closeConnection(connection);
         }
         return team;
     }
@@ -105,7 +84,6 @@ public class DBManager {
 
     public Connection getConnection(String connectionUrl) throws SQLException {
         Connection connection;
-        //   DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         connection = DriverManager.getConnection(connectionUrl);
         return connection;
     }
@@ -258,7 +236,7 @@ public class DBManager {
         }
     }
 
-    public void closeStatement(PreparedStatement statement) {
+    public static void closeStatement(PreparedStatement statement) {
         if (statement != null) {
             try {
                 statement.close();
@@ -268,7 +246,7 @@ public class DBManager {
         }
     }
 
-    public void closeConnection (Connection connection){
+    public static void closeConnection (Connection connection){
         if (connection != null) {
             try {
                 connection.close();

@@ -37,7 +37,7 @@ public class Demo {
         printList(dbManager.findAllTeams());
 
         // teams ==> [teamA, teamB, teamC]
-        System.out.println("===========================");
+        System.out.println("++++++++++++++++++++++++++++");
 
         // Part 3
 
@@ -71,7 +71,7 @@ public class Demo {
         // teamA teamB
 
         // teamA teamB teamC
-        System.out.println("===========================");
+        System.out.println("_____________________________");
 
 // Part 4
 
