@@ -105,7 +105,7 @@ public class DBManager {
 
     public Connection getConnection(String connectionUrl) throws SQLException {
         Connection connection;
-     //   DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+        //   DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         connection = DriverManager.getConnection(connectionUrl);
         return connection;
     }
@@ -113,16 +113,14 @@ public class DBManager {
 
     public static void insertUser(User user) {
         String sql = "INSERT INTO users VALUES (default,?);";
-        String sqlId = "SELECT id FROM users WHERE login=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
-             Connection connection1 = dbManager.getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql);
-             PreparedStatement statement1 = connection1.prepareStatement(sqlId)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getLogin());
             statement.executeUpdate();
-            statement1.setString(1, user.getLogin());
-            ResultSet resultSet = statement.executeQuery();
-            user.setId(resultSet.getInt("id"));
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                user.setId(resultSet.getInt(1));
+            }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         }
@@ -130,16 +128,14 @@ public class DBManager {
 
     public static void insertTeam(Team team) {
         String sql = "INSERT INTO teams VALUES (default,?);";
-        String sqlId = "SELECT id FROM teams WHERE name=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
-             Connection connection1 = dbManager.getConnection(dbManager.url);
-             PreparedStatement statement = connection.prepareStatement(sql);
-             PreparedStatement preparedStatement = connection1.prepareStatement(sqlId)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, team.getName());
             statement.executeUpdate();
-            preparedStatement.setString(1, team.getName());
-            ResultSet set = statement.executeQuery();
-            team.setId(set.getInt("id"));
+            ResultSet set = statement.getGeneratedKeys();
+            if (set.next()) {
+                team.setId(set.getInt(1));
+            }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
         }
@@ -248,7 +244,7 @@ public class DBManager {
         }
     }
 
-    public void closeStatement (PreparedStatement statement){
+    public void closeStatement(PreparedStatement statement) {
         if (statement != null) {
             try {
                 statement.close();
@@ -258,7 +254,7 @@ public class DBManager {
         }
     }
 
-    public void closeConnectionAutocommit(Connection con){
+    public void closeConnectionAutocommit(Connection con) {
         if (con != null) {
             try {
                 con.setAutoCommit(true);
