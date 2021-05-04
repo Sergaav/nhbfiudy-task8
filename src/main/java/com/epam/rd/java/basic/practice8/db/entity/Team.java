@@ -14,9 +14,6 @@ public class Team {
         this.id = id;
     }
 
-    private Team() {
-    }
-
     public void setName(String name) {
         this.name = name;
     }
