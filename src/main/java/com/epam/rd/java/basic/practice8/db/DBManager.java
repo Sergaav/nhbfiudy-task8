@@ -112,7 +112,7 @@ public class DBManager {
 
 
     public static void insertUser(User user) {
-        String sql = "INSERT INTO users VALUES (?);";
+        String sql = "INSERT INTO users VALUES (2,?);";
         String sqlId = "SELECT id FROM users WHERE login=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
              Connection connection1 = dbManager.getConnection(dbManager.url);
@@ -129,7 +129,7 @@ public class DBManager {
     }
 
     public static void insertTeam(Team team) {
-        String sql = "INSERT INTO teams VALUES (?);";
+        String sql = "INSERT INTO teams VALUES (2,?);";
         String sqlId = "SELECT id FROM teams WHERE name=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
              Connection connection1 = dbManager.getConnection(dbManager.url);
@@ -147,10 +147,10 @@ public class DBManager {
 
     public List<User> findAllUsers() {
         List<User> userList = new ArrayList<>();
-        String sql = "SELECT id,login FROM users;";
+        String sql = "SELECT * FROM users;";
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 User user = User.createUser(resultSet.getString("login"));
                 user.setId(resultSet.getInt("id"));
@@ -164,10 +164,10 @@ public class DBManager {
 
     public List<Team> findAllTeams() {
         List<Team> teamList = new ArrayList<>();
-        String sql = "SELECT id,name FROM teams;";
+        String sql = "SELECT * FROM teams;";
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
-             Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Team team = Team.createTeam(resultSet.getString("name"));
                 team.setId(resultSet.getInt("id"));
