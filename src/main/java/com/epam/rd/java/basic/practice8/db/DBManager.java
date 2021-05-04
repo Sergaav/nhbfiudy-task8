@@ -112,7 +112,7 @@ public class DBManager {
 
 
     public static void insertUser(User user) {
-        String sql = "INSERT INTO users VALUES (2,?);";
+        String sql = "INSERT INTO users VALUES (default,?);";
         String sqlId = "SELECT id FROM users WHERE login=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
              Connection connection1 = dbManager.getConnection(dbManager.url);
@@ -129,7 +129,7 @@ public class DBManager {
     }
 
     public static void insertTeam(Team team) {
-        String sql = "INSERT INTO teams VALUES (2,?);";
+        String sql = "INSERT INTO teams VALUES (default,?);";
         String sqlId = "SELECT id FROM teams WHERE name=?;";
         try (Connection connection = dbManager.getConnection(dbManager.url);
              Connection connection1 = dbManager.getConnection(dbManager.url);
