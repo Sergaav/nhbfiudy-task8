@@ -110,43 +110,61 @@ public class DBManager {
         return connection;
     }
 
+    public static void closeResultSet (ResultSet resultSet){
+        if (resultSet != null){
+            try {
+                resultSet.close();
+            } catch (SQLException throwables) {
+                System.err.println(throwables.getMessage());
+            }
+        }
+    }
+
 
     public static void insertUser(User user) {
         String sql = "INSERT INTO users VALUES (default,?);";
+        ResultSet resultSet=null;
         try (Connection connection = dbManager.getConnection(dbManager.url);
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getLogin());
             statement.executeUpdate();
-            ResultSet resultSet = statement.getGeneratedKeys();
+            resultSet = statement.getGeneratedKeys();
             if (resultSet.next()) {
                 user.setId(resultSet.getInt(1));
             }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        }finally {
+            closeResultSet(resultSet);
         }
     }
 
     public static void insertTeam(Team team) {
         String sql = "INSERT INTO teams VALUES (default,?);";
+        ResultSet set=null;
         try (Connection connection = dbManager.getConnection(dbManager.url);
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, team.getName());
             statement.executeUpdate();
-            ResultSet set = statement.getGeneratedKeys();
+            set = statement.getGeneratedKeys();
             if (set.next()) {
                 team.setId(set.getInt(1));
             }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        }finally {
+            closeResultSet(set);
         }
+
     }
 
     public List<User> findAllUsers() {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT * FROM users;";
+        ResultSet resultSet = null;
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 User user = User.createUser(resultSet.getString("login"));
                 user.setId(resultSet.getInt("id"));
@@ -154,6 +172,8 @@ public class DBManager {
             }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        }finally {
+            closeResultSet(resultSet);
         }
         return userList;
     }
@@ -161,9 +181,10 @@ public class DBManager {
     public List<Team> findAllTeams() {
         List<Team> teamList = new ArrayList<>();
         String sql = "SELECT * FROM teams;";
+        ResultSet resultSet=null;
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Team team = Team.createTeam(resultSet.getString("name"));
                 team.setId(resultSet.getInt("id"));
@@ -171,6 +192,8 @@ public class DBManager {
             }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        }finally {
+            closeResultSet(resultSet);
         }
         return teamList;
     }
@@ -180,7 +203,7 @@ public class DBManager {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = DBManager.getInstance().getConnection(dbManager.url);
+            connection = getInstanceConnection();
             statement = connection.prepareStatement(sql);
             connection.setAutoCommit(false);
             statement.setInt(1, user.getId());
@@ -197,36 +220,27 @@ public class DBManager {
             }
             System.err.println(throwables.getMessage());
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException throwables) {
-                    System.err.println(throwables.getMessage());
-                }
-            }
+            closeStatement(statement);
+            closeConnection(connection);
+
         }
+    }
+    public Connection getInstanceConnection () throws SQLException {
+        return DBManager.getInstance().getConnection(dbManager.url);
     }
 
     public void setTeamsForUser(User user, Team team1, Team team2) {
-        String sql = "INSERT INTO users_teams VALUES (?,?);";
+        String sql = "INSERT INTO users_teams VALUES (?,?),(?,?);";
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = DBManager.getInstance().getConnection(dbManager.url);
+            connection = getInstanceConnection();
             statement = connection.prepareStatement(sql);
             connection.setAutoCommit(false);
             statement.setInt(1, user.getId());
             statement.setInt(2, team1.getId());
-            statement.executeUpdate();
-            statement.setInt(1, user.getId());
-            statement.setInt(2, team2.getId());
+            statement.setInt(3, user.getId());
+            statement.setInt(4, team2.getId());
             statement.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
@@ -254,6 +268,16 @@ public class DBManager {
         }
     }
 
+    public void closeConnection (Connection connection){
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException throwables) {
+                System.err.println(throwables.getMessage());
+            }
+        }
+    }
+
     public void closeConnectionAutocommit(Connection con) {
         if (con != null) {
             try {
@@ -266,7 +290,7 @@ public class DBManager {
     }
 
     public void setTeamsForUser(User user, Team team1, Team team2, Team team3) {
-        String sql = "INSERT INTO users_teams VALUES (?,?);";
+        String sql = "INSERT INTO users_teams VALUES (?,?),(?,?),(?,?);";
         Connection connection = null;
         PreparedStatement statement = null;
         try {
@@ -275,12 +299,10 @@ public class DBManager {
             connection.setAutoCommit(false);
             statement.setInt(1, user.getId());
             statement.setInt(2, team1.getId());
-            statement.executeUpdate();
-            statement.setInt(1, user.getId());
-            statement.setInt(2, team2.getId());
-            statement.executeUpdate();
-            statement.setInt(1, user.getId());
-            statement.setInt(2, team3.getId());
+            statement.setInt(3, user.getId());
+            statement.setInt(4, team2.getId());
+            statement.setInt(5, user.getId());
+            statement.setInt(6, team3.getId());
             statement.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
@@ -302,16 +324,19 @@ public class DBManager {
         String sql = "SELECT users.login,teams.name FROM users JOIN users_teams ON users.id = users_teams.user_id " +
                 "JOIN teams ON teams.id=users_teams.team_id WHERE users.login=?;";
         List<Team> teamList = new ArrayList<>();
+        ResultSet resultSet =null;
         try (Connection connection = DBManager.getInstance().getConnection(dbManager.url);
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getLogin());
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Team team = Team.createTeam(resultSet.getString("name"));
                 teamList.add(team);
             }
         } catch (SQLException throwables) {
             System.err.println(throwables.getMessage());
+        }finally {
+            closeResultSet(resultSet);
         }
         return teamList;
     }
