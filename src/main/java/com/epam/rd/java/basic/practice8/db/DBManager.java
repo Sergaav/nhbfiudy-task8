@@ -214,17 +214,21 @@ public class DBManager {
             statement.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
+            closeConnectionWithRollback(connection);
             System.err.println(throwables.getMessage());
         } finally {
             closeStatement(statement);
             closeConnectionAutocommit(connection);
+        }
+    }
+
+    public static void closeConnectionWithRollback(Connection connection){
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 
@@ -276,13 +280,7 @@ public class DBManager {
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
+            closeConnectionWithRollback(connection);
             System.err.println(throwables.getMessage());
         } finally {
             closeStatement(preparedStatement);

@@ -60,4 +60,12 @@ public class Part2StudentTest {
         Assert.assertEquals(2,teamList.size());
     }
 
+    @Test
+    public void shouldAddTeamIdAutomatically(){
+        dbManager = DBManager.getInstance();
+        DBManager.insertTeam(Team.createTeam("teamA"));
+        Team teamA = DBManager.getTeam("teamA");
+        Assert.assertNotEquals(0,teamA.getId());
+    }
+
 }

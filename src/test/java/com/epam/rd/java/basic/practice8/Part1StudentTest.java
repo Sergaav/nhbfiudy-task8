@@ -2,6 +2,7 @@ package com.epam.rd.java.basic.practice8;
 
 import com.epam.rd.java.basic.practice8.db.DBManager;
 import com.epam.rd.java.basic.practice8.db.entity.User;
+import jdk.internal.jline.internal.TestAccessible;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,6 +60,14 @@ public class Part1StudentTest {
         DBManager.insertUser(User.createUser("obama"));
         List<User> userList = dbManager.findAllUsers();
         Assert.assertEquals(2,userList.size());
+    }
+
+    @Test
+    public void shouldAddIdAutomatically(){
+        dbManager = DBManager.getInstance();
+        DBManager.insertUser(User.createUser("petrov"));
+        User userPetrov = DBManager.getUser("petrov");
+        Assert.assertNotEquals(0,userPetrov.getId());
     }
 
 }
