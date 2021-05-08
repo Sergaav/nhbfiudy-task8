@@ -1,7 +1,7 @@
-package com.epam.rd.java.basic.practice8.db;
+package com.savaz.rd.java.basic.practice8.db;
 
-import com.epam.rd.java.basic.practice8.db.entity.Team;
-import com.epam.rd.java.basic.practice8.db.entity.User;
+import com.savaz.rd.java.basic.practice8.db.entity.Team;
+import com.savaz.rd.java.basic.practice8.db.entity.User;
 
 import java.io.FileInputStream;
 import java.io.IOException;

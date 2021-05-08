@@ -1,6 +1,7 @@
-package com.epam.rd.java.basic.practice8;
-import com.epam.rd.java.basic.practice8.db.DBManager;
-import com.epam.rd.java.basic.practice8.db.entity.Team;
+package com.savaz.rd.java.basic.practice8;
+
+import com.savaz.rd.java.basic.practice8.db.DBManager;
+import com.savaz.rd.java.basic.practice8.db.entity.Team;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
-public class Part2StudentTest {
+public class Part5StudentTest {
     private static final String JDBC_DRIVER = "org.h2.Driver";
     private static final String DB_URL = "jdbc:h2:~/test";
     private static final String URL_CONNECTION = "jdbc:h2:~/test;user=youruser;password=yourpassword;";
@@ -52,20 +53,19 @@ public class Part2StudentTest {
     }
 
     @Test
-    public void shouldReturnListOfTeams (){
+    public void shouldChangeTeamName() {
         dbManager = DBManager.getInstance();
-        DBManager.insertTeam(Team.createTeam("teamB"));
-        DBManager.insertTeam(Team.createTeam("teamC"));
-        List<Team> teamList = dbManager.findAllTeams();
-        Assert.assertEquals(2,teamList.size());
+        Team team = DBManager.getTeam("teamC");
+        int index = team.getId();
+        team.setName("teamX");
+        dbManager.updateTeam(team);
+        List<Team> teams = dbManager.findAllTeams();
+        String newName=null;
+        for (Team t : teams) {
+            if (t.getId() == index) {
+                newName = t.getName();
+            }
+        }
+        Assert.assertEquals("teamX",newName);
     }
-
-    @Test
-    public void shouldAddTeamIdAutomatically(){
-        dbManager = DBManager.getInstance();
-        DBManager.insertTeam(Team.createTeam("teamA"));
-        Team teamA = DBManager.getTeam("teamA");
-        Assert.assertNotEquals(0,teamA.getId());
-    }
-
 }

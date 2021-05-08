@@ -1,7 +1,7 @@
-package com.epam.rd.java.basic.practice8;
+package com.savaz.rd.java.basic.practice8;
 
-import com.epam.rd.java.basic.practice8.db.DBManager;
-import com.epam.rd.java.basic.practice8.db.entity.User;
+import com.savaz.rd.java.basic.practice8.db.DBManager;
+import com.savaz.rd.java.basic.practice8.db.entity.User;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
